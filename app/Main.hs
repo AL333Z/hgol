@@ -41,16 +41,15 @@ aliveNeighboursCount :: World -> [Cell] -> Int
 aliveNeighboursCount world cells = length $ aliveCells world cells
 
 cellsWithNeighboursCount :: World -> [Cell] -> [(Cell, Int)]
-cellsWithNeighboursCount world cellsToEvaluate =
-    map (\cell -> (cell, aliveNeighboursCount world (neighbours cell))) cellsToEvaluate
+cellsWithNeighboursCount world = map (\cell -> (cell, aliveNeighboursCount world (neighbours cell)))
 
 cellsAfterEvolution :: [(Cell, Int)] -> (Int -> Bool) -> [Cell]
 cellsAfterEvolution cells pred = map fst $ filter (\(cell, count) -> pred count) cells
 
 keepAlivePred :: Int -> Bool
 keepAlivePred x | x < 2 = False
-            | x == 2 || x == 3 = True
-            | x > 3  = False
+                | x == 2 || x == 3 = True
+                | x > 3  = False
 
 resurrectDeadPred :: Int -> Bool
 resurrectDeadPred x = x == 3
@@ -58,7 +57,7 @@ resurrectDeadPred x = x == 3
 evolve :: World -> World
 evolve currentWorld = stillAliveCells ++ resurrectedCells
     where
-        deadCellsToEvaluate = nub $ currentWorld >>= (\cell -> deadCells currentWorld $ neighbours cell)
+        deadCellsToEvaluate = nub $ currentWorld >>= deadCells currentWorld . neighbours
         deadCellsWithNeighbours = cellsWithNeighboursCount currentWorld deadCellsToEvaluate
         resurrectedCells = cellsAfterEvolution deadCellsWithNeighbours resurrectDeadPred
 
@@ -72,17 +71,15 @@ evolveLogging w = do
                 return newWorld
 
 main :: IO ()
-main = mainEvolution glider 25
+main = mainEvolution glider 50
 
 mainEvolution :: World -> Int -> IO ()
-mainEvolution w step = do
-        if step > 0
-            then do
+mainEvolution w step = when (step > 0) $
+             do
                 clearScreen
                 newWorld <- evolveLogging w
-                threadDelay 400000
+                threadDelay 200000
                 mainEvolution newWorld (step - 1)
-            else return ()
 
 glider :: [Cell]
 glider = [Cell 2 0, Cell 2 1, Cell 2 2, Cell 0 1, Cell 1 2]
