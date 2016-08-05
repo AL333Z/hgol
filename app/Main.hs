@@ -8,11 +8,6 @@ import System.Process
 import Control.Concurrent
 import System.Console.ANSI
 
-data Cell = Cell Int Int
-    deriving (Show, Eq, Ord)
-
-type World = [Cell]
-
 worldMatrix :: World -> Matrix Char
 worldMatrix w =
     let
@@ -71,8 +66,11 @@ evolveLogging w = do
                 printWorld newWorld
                 return newWorld
 
+-- main :: IO ()
+-- main = mainEvolution glider 25
+
 main :: IO ()
-main = mainEvolution glider 25
+main = readLife "patterns/pic1.life"
 
 mainEvolution :: World -> Int -> IO ()
 mainEvolution w step = do
