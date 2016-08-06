@@ -69,10 +69,10 @@ inputWorld :: Parser World
 inputWorld = do
     input <- inputBlock
     let matrix = fromLists input
-        cells = [((Cell i, j), matrix ! (i, j)) | i <- [1..(length input)],
-                                                  j <- [1..(length $ head input)] ]
-        listOfCells = toList $ fromLists cells
-        aliveCells = filter (\x -> snd x == True) listOfCells
+        rowNum = length input
+        colNum = length $ head input
+        cells = [((Cell i j), (matrix ! (i, j))) | i <- [1..rowNum], j <- [1..colNum]]
+        aliveCells = filter (\x -> snd x == True) cells
         world = map fst aliveCells
     return world
 
@@ -84,13 +84,10 @@ infoLine = char '#' >> many (alphaNum <|> space) >> newline *> return ()
 {-= World map file reading =-}
 
 -- Reads a world map from a specified file and creates a World of alive cells
-readLife :: String -> IO ()
-readLife file = do
+readLife :: String -> IO (Either ParseError World)
+readLife file = parseFromFile (offset >> inputWorld <* many space) file
 --     result <- parseFromFile ((infoLine `manyTill` offset) >> many1 inputBlock <* many space) file
 --     result <- parseFromFile (offset >> many1 inputBlock <* many space) file
---     result <- parseFromFile (infoLine `manyTill` many1 inputBlock <* many space) file
+--     result <- parseFromFile (infoLine `manyTill` many1 inputBlclearock <* many space) file
 --     result <- parseFromFile (infoLine `manyTill` inputBlock) file
-    result <- parseFromFile (offset >> inputBlock <* many space) file
-    case result of
-        Left err  -> print err
-        Right res  -> print res
+--  parseFromFile

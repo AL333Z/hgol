@@ -13,7 +13,7 @@ worldMatrix w =
     let
         r =  maximum (map (\(Cell x y) -> x) w)
         c =  maximum (map (\(Cell x y) -> y) w)
-    in matrix (r+1) (c+1) $ \(i, j) -> if Cell (i-1) (j-1) `elem` w then 'O' else '.'
+    in matrix r c $ \(i, j) -> if Cell i j `elem` w then 'O' else '.'
 
 printWorld :: World -> IO ()
 printWorld w = print $ worldMatrix w
@@ -44,8 +44,8 @@ cellsAfterEvolution cells pred = map fst $ filter (\(cell, count) -> pred count)
 
 keepAlivePred :: Int -> Bool
 keepAlivePred x | x < 2 = False
-            | x == 2 || x == 3 = True
-            | x > 3  = False
+                | x == 2 || x == 3 = True
+                | x > 3  = False
 
 resurrectDeadPred :: Int -> Bool
 resurrectDeadPred x = x == 3
@@ -66,12 +66,6 @@ evolveLogging w = do
                 printWorld newWorld
                 return newWorld
 
--- main :: IO ()
--- main = mainEvolution glider 25
-
-main :: IO ()
-main = readLife "patterns/pic1.life"
-
 mainEvolution :: World -> Int -> IO ()
 mainEvolution w step = do
         if step > 0
@@ -82,8 +76,18 @@ mainEvolution w step = do
                 mainEvolution newWorld (step - 1)
             else return ()
 
+-- patterns
+
 glider :: [Cell]
 glider = [Cell 2 0, Cell 2 1, Cell 2 2, Cell 0 1, Cell 1 2]
 
 plus :: [Cell]
 plus = [Cell 1 2,Cell 2 2,Cell 3 2]
+
+-- Main loop
+main :: IO ()
+main = do
+        res <- readLife "patterns/pic1.life"
+        case res of
+            Left err -> print err
+            Right world -> mainEvolution world 25
