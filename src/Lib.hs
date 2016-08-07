@@ -4,15 +4,9 @@ import Text.Parsec ((<|>), many, many1)
 import Text.Parsec (ParseError)
 import Text.Parsec.String
 import Text.Parsec.Char
-import Data.Char (isLetter, isDigit)
 import Text.ParserCombinators.Parsec.Combinator
 import Data.Matrix (fromLists, toList, (!))
-
--- Move this to ADT module
-data Cell = Cell Int Int
-    deriving (Show, Eq, Ord)
-
-type World = [Cell]
+import ADT
 
 -- Parses a dead cell
 deadCell :: Parser Bool
