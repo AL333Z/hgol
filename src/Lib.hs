@@ -8,45 +8,30 @@ import Data.Char (isLetter, isDigit)
 import Text.ParserCombinators.Parsec.Combinator
 import Data.Matrix (fromLists, toList, (!))
 
-
 -- Move this to ADT module
 data Cell = Cell Int Int
     deriving (Show, Eq, Ord)
 
 type World = [Cell]
 
--- Actual parsing stuff
-
+-- Parses a dead cell
 deadCell :: Parser Bool
 deadCell = char '.' >> return False
 
+-- Parses an alive cell
 aliveCell :: Parser Bool
 aliveCell = char '*' >> return True
 
+-- Parses a row made up of dead and living cells
+row :: Parser [Bool]
+row = many1 (deadCell <|> aliveCell)
+
+-- Parses a natural number
 nat :: Parser Int
 nat = do ds <- many1 digit
-         return (read ds)
+         return $ read ds
 
--- Parses a block of contiguous same-state cells
-paramRow :: Parser [Bool]
-paramRow = do
-             n <- nat
-             b <- aliveCell <|> deadCell
-             return (replicate n b)
-
--- Parses a row of a map made up solely of dead and living cells
-plainRow :: Parser [Bool]
-plainRow = many1 (deadCell <|> aliveCell)
-
--- Parses a full row, which may have parameterised blocks or not
-row :: Parser [Bool]
-row = plainRow
---     do
---         f <- plainRow <|> paramRow
---         g <- row
---         return (f ++ g) <|> return []
-
--- Parses an offset (in the world map) pair with respect to the origin (0,0)
+-- Parses an offset with respect to the origin (0,0)
 offset :: Parser Cell
 offset = do
            string "#P"
@@ -57,7 +42,7 @@ offset = do
            newline
            return $ Cell x y
 
--- Parses a world map block
+-- Parses a matrix of boolean, which represents the inital world
 inputBlock :: Parser [[Bool]]
 inputBlock = do
     m <- many1 $ row <* newline
@@ -65,6 +50,7 @@ inputBlock = do
         sqr  = map (\r -> r ++ replicate (cols - length r) False) m
     return sqr
 
+-- Parses a world
 inputWorld :: Parser World
 inputWorld = do
     input <- inputBlock
@@ -76,18 +62,6 @@ inputWorld = do
         world = map fst aliveCells
     return world
 
--- -- Parses a line of comments or other non-considered information
-infoLine :: Parser ()
-infoLine = char '#' >> many (alphaNum <|> space) >> newline *> return ()
-
------------------------------------------------------------------------------
-{-= World map file reading =-}
-
 -- Reads a world map from a specified file and creates a World of alive cells
-readLife :: String -> IO (Either ParseError World)
+readLife ::  String -> IO (Either ParseError World)
 readLife file = parseFromFile (offset >> inputWorld <* many space) file
---     result <- parseFromFile ((infoLine `manyTill` offset) >> many1 inputBlock <* many space) file
---     result <- parseFromFile (offset >> many1 inputBlock <* many space) file
---     result <- parseFromFile (infoLine `manyTill` many1 inputBlclearock <* many space) file
---     result <- parseFromFile (infoLine `manyTill` inputBlock) file
---  parseFromFile
