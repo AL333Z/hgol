@@ -34,8 +34,7 @@ aliveCellsCount world cells = length $ aliveCells world cells
 
 -- Given a World and a list of Cell, returns a list of pair of Cell, neighbours count
 cellsWithNeighboursCount :: World -> [Cell] -> [(Cell, Int)]
-cellsWithNeighboursCount world cells =
-    map (\cell -> (cell, aliveCellsCount world (neighbours cell))) cells
+cellsWithNeighboursCount world = map (\cell -> (cell, aliveCellsCount world (neighbours cell)))
 
 --Given a list of cell and neighbours count and a predicate, return a list of alive cells
 cellsAfterEvolution :: [(Cell, Int)] -> (Int -> Bool) -> [Cell]
@@ -55,7 +54,7 @@ resurrectDeadPred x = x == 3
 evolve :: World -> World
 evolve currentWorld = stillAliveCells ++ resurrectedCells
     where
-        deadCellsToEvaluate = nub $ currentWorld >>= (\cell -> deadCells currentWorld $ neighbours cell)
+        deadCellsToEvaluate = nub $ currentWorld >>= deadCells currentWorld . neighbours
         deadCellsWithNeighbours = cellsWithNeighboursCount currentWorld deadCellsToEvaluate
         resurrectedCells = cellsAfterEvolution deadCellsWithNeighbours resurrectDeadPred
 
@@ -75,7 +74,7 @@ worldMatrix w =
     let
         r =  maximum (map (\(Cell x y) -> x) w)
         c =  maximum (map (\(Cell x y) -> y) w)
-    in matrix r c $ \(i, j) -> if Cell i j `elem` w then '*' else '.'
+    in matrix r c $ \(i, j) -> if Cell i j `elem` w then '0' else ' '
 
 -- Utility method that prints a world
 printWorld :: World -> IO ()

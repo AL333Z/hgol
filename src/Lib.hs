@@ -1,12 +1,11 @@
 module Lib where
 
-import Text.Parsec ((<|>), many, many1)
-import Text.Parsec (ParseError)
+import ADT
+import Text.Parsec ((<|>), many, many1, ParseError)
 import Text.Parsec.String
 import Text.Parsec.Char
 import Text.ParserCombinators.Parsec.Combinator
 import Data.Matrix (fromLists, toList, (!))
-import ADT
 
 -- Parses a dead cell
 deadCell :: Parser Bool
@@ -51,11 +50,11 @@ inputWorld = do
     let matrix = fromLists input
         rowNum = length input
         colNum = length $ head input
-        cells = [((Cell i j), (matrix ! (i, j))) | i <- [1..rowNum], j <- [1..colNum]]
-        aliveCells = filter (\x -> snd x == True) cells
+        cells = [(Cell i j, matrix ! (i, j)) | i <- [1..rowNum], j <- [1..colNum]]
+        aliveCells = filter snd cells
         world = map fst aliveCells
     return world
 
 -- Reads a world map from a specified file and creates a World of alive cells
 readLife ::  String -> IO (Either ParseError World)
-readLife file = parseFromFile (offset >> inputWorld <* many space) file
+readLife = parseFromFile (offset >> inputWorld <* many space)

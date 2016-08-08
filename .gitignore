@@ -17,6 +17,7 @@ cabal.sandbox.config
 *.eventlog
 .stack-work/
 cabal.project.local
-.idea
+.idea/
+.idea/modules.xml
 .idea/*
 *.iml
