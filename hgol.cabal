@@ -1,23 +1,26 @@
 name:                hgol
 version:             0.1.0.0
-synopsis:            Initial project template from stack
-description:         Please see README.md
-homepage:            https://github.com/githubuser/hgol#readme
+synopsis:            Game of life, in Haskell
+description:         Because, why not?
+homepage:            https://github.com/al333z/hgol#readme
 license:             BSD3
 license-file:        LICENSE
-author:              Author name here
-maintainer:          example@example.com
-copyright:           2016 Author name here
+author:              Alessandro Zoffoli
+maintainer:          alessandrozoffoli@gmail.com
+copyright:           2016 Alessandro Zoffoli
 category:            Web
 build-type:          Simple
 -- extra-source-files:
 cabal-version:       >=1.10
 
 library
-  hs-source-dirs:      src
-  exposed-modules:     Lib
-  build-depends:       base >= 4.7 && < 5
-  default-language:    Haskell2010
+  hs-source-dirs:     src
+  exposed-modules:    Lib
+                    , ADT
+  build-depends:      base
+                    , parsec
+                    , matrix
+  default-language:   Haskell2010
 
 executable hgol-exe
   hs-source-dirs:      app
@@ -25,9 +28,7 @@ executable hgol-exe
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , hgol
-                     , process
                      , ansi-terminal
-                     , matrix == 0.3.5.0
   default-language:    Haskell2010
 
 test-suite hgol-test
@@ -41,4 +42,4 @@ test-suite hgol-test
 
 source-repository head
   type:     git
-  location: https://github.com/githubuser/hgol
+  location: https://github.com/al333z/hgol
